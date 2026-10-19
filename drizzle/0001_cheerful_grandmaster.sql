@@ -1,0 +1,1 @@
+CREATE INDEX `messages_expiry_idx` ON `messages` (`expires_at`);
