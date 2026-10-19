@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { messageKeys } from '../lib/message-crypto.ts';
 const origin = process.env.TEST_ORIGIN || 'http://localhost:5173';
 const headers = { Origin: origin, 'Content-Type': 'application/json' };
 const encode = bytes => Buffer.from(bytes).toString('base64url');
@@ -25,3 +26,29 @@ assert.equal((await reveal('bad')).status,400);
 assert.equal((await fetch(origin+'/api/messages',{method:'POST',headers:{...headers,Origin:'https://elsewhere.test'},body:'{}'})).status,403);
 assert.equal((await fetch(origin+'/api/messages',{method:'POST',headers,body:JSON.stringify({ciphertext:'invalid',iv:'bad',hours:24})})).status,400);
 console.log('Passed: Unicode encryption round-trip, repeat reveal denied, 5 concurrent reveals allow exactly one winner, no-store, invalid input and cross-origin rejection.');
+
+// Protected links require a derived authorization token before deletion.
+const seed = crypto.getRandomValues(new Uint8Array(32));
+const protectedKeys = await messageKeys(seed, 'quiet-moment-42');
+const protectedIv = crypto.getRandomValues(new Uint8Array(12));
+const protectedCiphertext = await crypto.subtle.encrypt({name:'AES-GCM',iv:protectedIv},protectedKeys.key,new TextEncoder().encode(original));
+const createdProtected = await fetch(origin+'/api/messages',{method:'POST',headers,body:JSON.stringify({ciphertext:encode(protectedCiphertext),iv:encode(protectedIv),hours:24,accessToken:protectedKeys.accessToken})});
+assert.equal(createdProtected.status,200);
+const protectedId = (await createdProtected.json()).id;
+const protectedReveal = (accessToken,id=protectedId) => fetch(origin+'/api/messages/reveal',{method:'POST',headers,body:JSON.stringify({id,accessToken})});
+assert.equal((await protectedReveal(undefined)).status,401);
+const wrongKeys = await messageKeys(seed, 'wrong-password');
+for(let attempt=0;attempt<3;attempt++) assert.equal((await protectedReveal(wrongKeys.accessToken)).status,401);
+const correctKeys = await messageKeys(seed, 'quiet-moment-42');
+const openedProtected=await protectedReveal(correctKeys.accessToken);
+assert.equal(openedProtected.status,200);
+const protectedBody=await openedProtected.json();
+const protectedDecoded=await crypto.subtle.decrypt({name:'AES-GCM',iv:Buffer.from(protectedBody.iv,'base64url')},correctKeys.key,Buffer.from(protectedBody.ciphertext,'base64url'));
+assert.equal(new TextDecoder().decode(protectedDecoded),original);
+assert.equal((await protectedReveal(correctKeys.accessToken)).status,410);
+await assert.rejects(crypto.subtle.decrypt({name:'AES-GCM',iv:protectedIv},wrongKeys.key,protectedCiphertext));
+const concurrentProtected=await fetch(origin+'/api/messages',{method:'POST',headers,body:JSON.stringify({ciphertext:encode(protectedCiphertext),iv:encode(protectedIv),hours:24,accessToken:protectedKeys.accessToken})});
+const concurrentProtectedId=(await concurrentProtected.json()).id;
+const protectedResults=await Promise.all(Array.from({length:5},()=>protectedReveal(correctKeys.accessToken,concurrentProtectedId)));
+assert.deepEqual(protectedResults.map(r=>r.status).sort(),[200,410,410,410,410]);
+console.log('Passed: missing/wrong password cannot consume a message; correct password decrypts once; password cannot be bypassed by removing link marker; concurrent protected reveals allow exactly one winner.');
