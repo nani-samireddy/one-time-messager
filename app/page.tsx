@@ -1,5 +1,6 @@
 "use client";
 
+import { SiteFooter } from "../components/site/footer";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, ArrowRight, Check, Copy, LockKeyhole, Link2, Eye, Flame, X, Plus, ShieldCheck } from "lucide-react";
 
@@ -34,6 +35,13 @@ export default function Home() {
     window.addEventListener("pagehide", hide);
     return () => { window.removeEventListener("hashchange", readHash); window.removeEventListener("pagehide", hide); };
   }, []);
+
+  useEffect(() => {
+    const robots = document.querySelector('meta[name="robots"]');
+    const prior = robots?.getAttribute("content") || "index, follow";
+    if (view !== "write") robots?.setAttribute("content", "noindex, nofollow, noarchive");
+    return () => { robots?.setAttribute("content", prior); };
+  }, [view]);
 
   async function create() {
     if (!message.trim() || busy) return;
@@ -95,7 +103,7 @@ export default function Home() {
       <div className="steps"><div><span className="step-icon"><LockKeyhole size={19}/></span><h3>Write it privately</h3><p>Your words are encrypted<br/>before they leave your device.</p></div><div><span className="step-icon"><Link2 size={20}/></span><h3>Send the link</h3><p>A small link for something<br/>you don’t want to leave around.</p></div><div><span className="step-icon"><Flame size={20}/></span><h3>One read. Then gone.</h3><p>Opened once, deleted for good.<br/>The same link won’t work twice.</p></div></div>
       <p className="quiet-note">P.S. Some things are better left off the record.</p>
     </main>
-    <footer><span>PRIVATE NOTES · NO PERMANENT RECORD</span><span>Made for the moment <span className="footer-star">✳</span></span></footer>
+    <SiteFooter/>
     {info && <div className="modal-backdrop" onClick={() => setInfo(false)}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="info-title" onClick={e => e.stopPropagation()}><button className="modal-close" onClick={() => setInfo(false)} aria-label="Close explanation" autoFocus><X size={20}/></button><div className="eyebrow">PRIVATE BY DESIGN</div><h2 id="info-title">A note that doesn’t stay.</h2><p>Your browser encrypts the message. The link holds its ID and key material; the key stays in the URL fragment and isn’t sent to the server.</p><p>When the recipient taps Reveal, the server returns the encrypted message and deletes it in one step. A second request cannot retrieve it, even from another device.</p><p>Unopened messages expire after your chosen time. Anyone with the full link and, if set, the password can reveal it first. Passwords add another layer of browser encryption and are never sent to the server. A recipient can still copy or screenshot what they read.</p><button className="primary" onClick={() => setInfo(false)}>Got it <Check size={16}/></button></section></div>}
   </div>;
 }

@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-const headers = { "Cache-Control": "no-store, max-age=0", "Pragma": "no-cache" };
+const headers = { "X-Robots-Tag": "noindex, nofollow, noarchive", "Cache-Control": "no-store, max-age=0", "Pragma": "no-cache" };
 export async function POST(request: Request) {
   if (request.headers.get("origin") !== new URL(request.url).origin) return Response.json({ error: "Invalid origin." }, { status: 403, headers });
   try {

@@ -61,3 +61,13 @@ The integration check covers encryption with Unicode, successful first reveal, r
 - Unopened messages become inaccessible after 1 hour, 24 hours, or 7 days. Expired rows are cleaned up on subsequent creates. With no subsequent traffic they may remain encrypted in the database until cleanup; they cannot be revealed through the API.
 - The reader can view the message until closing or navigating away. Refreshing does not retrieve it again. Network failure after deletion can lose a message before the recipient sees it.
 - Anyone with the complete link and, for protected messages, the password can reveal it first. Recipients can still copy or screenshot the message. Deletion from the live application database does not promise erasure from provider backups.
+
+## Public pages and discovery
+
+- `/about`, `/privacy`, `/terms`: product information and policies, linked from every footer.
+- `/sitemap.xml`: only the four public pages; never message links.
+- `/robots.txt`: allows public content and excludes the API and authentication routes.
+- `/llms.txt` and `/llms-full.txt`: public product and policy documentation for agents, without private messages.
+- Open Graph/Twitter image, JSON-LD, canonical URLs, web manifest, and Apple icon are included.
+
+`lib/site.ts` defines the canonical public origin. Update it when moving to a custom domain. The separate ChatGPT Sites deployment points to the Cloudflare origin as canonical. Message views set `noindex, nofollow, noarchive`; API responses also use `X-Robots-Tag` and `no-store`. Robots directives are not access controls. Only possession of the required link and password can authorize retrieval.
