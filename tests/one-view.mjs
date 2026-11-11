@@ -52,3 +52,14 @@ const concurrentProtectedId=(await concurrentProtected.json()).id;
 const protectedResults=await Promise.all(Array.from({length:5},()=>protectedReveal(correctKeys.accessToken,concurrentProtectedId)));
 assert.deepEqual(protectedResults.map(r=>r.status).sort(),[200,410,410,410,410]);
 console.log('Passed: missing/wrong password cannot consume a message; correct password decrypts once; password cannot be bypassed by removing link marker; concurrent protected reveals allow exactly one winner.');
+
+const noExpiryResponse = await fetch(origin+'/api/messages',{method:'POST',headers,body:JSON.stringify({ciphertext:encode(protectedCiphertext),iv:encode(protectedIv),hours:null,accessToken:protectedKeys.accessToken})});
+assert.equal(noExpiryResponse.status,200);
+const noExpiry = await noExpiryResponse.json();
+assert.equal(noExpiry.expiresAt,null);
+const cleanupTrigger = await create();
+assert.equal((await reveal(cleanupTrigger)).status,200);
+assert.equal((await protectedReveal(wrongKeys.accessToken,noExpiry.id)).status,401);
+assert.equal((await protectedReveal(correctKeys.accessToken,noExpiry.id)).status,200);
+assert.equal((await protectedReveal(correctKeys.accessToken,noExpiry.id)).status,410);
+console.log('Passed: no-expiry messages survive expiry cleanup and still open only once.');

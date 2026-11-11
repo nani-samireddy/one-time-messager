@@ -1,5 +1,6 @@
 import { ArrowRight, Heart, LockKeyhole, PenLine, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { SITE_URL } from "../../lib/site";
 import { blankLetter, type Letter } from "../../lib/letter";
 import { Envelope, LetterPaper } from "./letter-art";
 
@@ -51,8 +52,8 @@ export function PostHome({ start }: { start: (text?: string) => void }) {
       <h2 id="faq-title">A few good questions</h2>
       <details><summary>Can someone read my letter twice?</summary><p>The link can retrieve it only once. The recipient can still copy or screenshot it while it’s open.</p></details>
       <details><summary>Is my letter private?</summary><p>Your browser encrypts the words and design together. Only someone with the full link and, if set, the password can open it.</p></details>
-      <details><summary>What if they don’t open it?</summary><p>Choose an expiry of one hour, one day, or seven days. After that, the link no longer opens.</p></details>
-      <details><summary>Do I need an account or a payment?</summary><p>Once is free. The <a href="https://once-message.later-voice-token.workers.dev/">public version</a> does not require an account.</p></details>
+      <details><summary>What if they don’t open it?</summary><p>Choose one hour, one day, seven days, or Never expires. A link with no expiry stays available until it’s opened.</p></details>
+      <details><summary>Do I need an account or a payment?</summary><p>Once is free. The <a href={SITE_URL}>public version</a> does not require an account.</p></details>
       <button type="button" className="post-button post-primary" onClick={() => start()}>Write your own message <ArrowRight size={18}/></button>
       <p className="post-postscript">P.S. Some things are better left off the record.</p>
     </section>

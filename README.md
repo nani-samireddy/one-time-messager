@@ -39,6 +39,8 @@ Use the Workers Free plan and the included D1 free tier. No paid database, paid 
 
 3. Open the `workers.dev` URL printed by Wrangler. Links automatically use the site's current origin.
 
+The production Worker serves [once.samireddy.com](https://once.samireddy.com/) and keeps its original `workers.dev` address for existing links. To keep the custom domain on redeployment, pass it as a second argument to `npm run host:prepare -- YOUR_DATABASE_ID once.samireddy.com`.
+
 After updates, rebuild, rerun `host:prepare` with the same database ID, apply new migrations, and redeploy. The generated Cloudflare configuration is checkout-local and ignored by Git. Keep the same database for existing unopened links to continue working. Direct Cloudflare deployment is independent of the optional Sites hosting manifest.
 
 ## Verify
@@ -58,7 +60,7 @@ The integration check covers encryption with Unicode, successful first reveal, r
 - Styled letters use `/#<random-id>.<key-material>[.p].l`. Text, optional names, and styling are encrypted together. Older plain-text links without the `.l` flag remain supported. Both the ID and key material live in the fragment. The ID is sent explicitly to the reveal API; the key never is.
 - The URL does not contain the entire message: that would let anyone decode it repeatedly. A server-side record is necessary to enforce one-time retrieval across devices.
 - The Reveal my message button prevents ordinary link preview crawlers from consuming messages. A single `DELETE ... RETURNING` query retrieves and deletes the message, preventing simultaneous reads.
-- Unopened messages become inaccessible after 1 hour, 24 hours, or 7 days. Expired rows are cleaned up on subsequent creates. With no subsequent traffic they may remain encrypted in the database until cleanup; they cannot be revealed through the API.
+- Unopened messages can expire after 1 hour, 24 hours, or 7 days. Choose Never expires to keep a link available until its first reveal. Expired rows are cleaned up on subsequent creates. With no subsequent traffic they may remain encrypted in the database until cleanup; they cannot be revealed through the API.
 - The reader can view the message until closing or navigating away. Refreshing does not retrieve it again. Network failure after deletion can lose a message before the recipient sees it.
 - Anyone with the complete link and, for protected messages, the password can reveal it first. Recipients can still copy or screenshot the message. Deletion from the live application database does not promise erasure from provider backups.
 

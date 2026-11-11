@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { hasExpired } from "../../../../lib/message-expiry";
 const headers = { "X-Robots-Tag": "noindex, nofollow, noarchive", "Cache-Control": "no-store, max-age=0", "Pragma": "no-cache" };
 export async function POST(request: Request) {
   if (request.headers.get("origin") !== new URL(request.url).origin) return Response.json({ error: "Invalid origin." }, { status: 403, headers });
@@ -13,9 +14,9 @@ export async function POST(request: Request) {
     const row = await env.DB!.prepare("DELETE FROM messages WHERE id = ? AND (password_hash IS NULL OR password_hash = ?) RETURNING ciphertext, iv, expires_at").bind(id, passwordHash).first<{ciphertext: string; iv: string; expires_at: number}>();
     if (!row) {
       const existing = await env.DB!.prepare("SELECT expires_at FROM messages WHERE id = ?").bind(id).first<{expires_at: number}>();
-      if (existing && existing.expires_at > Date.now()) return Response.json({ error: "Incorrect password. Please try again.", passwordRequired: true }, { status: 401, headers });
+      if (existing && !hasExpired(existing.expires_at)) return Response.json({ error: "Incorrect password. Please try again.", passwordRequired: true }, { status: 401, headers });
     }
-    if (!row || row.expires_at <= Date.now()) return Response.json({ error: "This message has already been opened or has expired." }, { status: 410, headers });
+    if (!row || hasExpired(row.expires_at)) return Response.json({ error: "This message has already been opened or has expired." }, { status: 410, headers });
     return Response.json({ ciphertext: row.ciphertext, iv: row.iv }, { headers });
   } catch { return Response.json({ error: "Couldn't reach your message. Please try again." }, { status: 500, headers }); }
 }

@@ -114,7 +114,7 @@ export default function Home() {
       const ciphertext = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(payload));
       const response = await fetch("/api/messages", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ciphertext: encode(new Uint8Array(ciphertext)), iv: encode(iv), hours: Number(hours), accessToken }),
+        body: JSON.stringify({ ciphertext: encode(new Uint8Array(ciphertext)), iv: encode(iv), hours: hours === "never" ? null : Number(hours), accessToken }),
       });
       const data = await response.json() as ApiResult;
       if (!response.ok || !data.id) throw new Error(data.error || "Couldn’t seal this letter.");
@@ -212,10 +212,10 @@ export default function Home() {
           <div className="post-actions"><button type="button" className="post-back" onClick={() => go("write")}><ArrowLeft size={17}/> Edit letter</button><button type="button" className="post-button post-primary" onClick={() => go("seal")}>Ready to seal <ArrowRight size={18}/></button></div>
         </>}
         {view === "seal" && <>
-          <div className="post-heading"><span className="post-kicker">JUST BETWEEN YOU TWO</span><h1 ref={title} tabIndex={-1}>Seal your letter.</h1><p>Decide how long it can wait to be opened.</p></div>
+          <div className="post-heading"><span className="post-kicker">JUST BETWEEN YOU TWO</span><h1 ref={title} tabIndex={-1}>Seal your letter.</h1><p>Choose an expiry or keep the link available until it’s opened.</p></div>
           <form className="post-panel" onSubmit={event => { event.preventDefault(); void create(); }}>
             <Envelope compact paper={letter.paper} stamp={letter.stamp}/>
-            <label className="post-expiry">Expires if unopened<select value={hours} disabled={busy} onChange={event => setHours(event.target.value)}><option value="1">After 1 hour</option><option value="24">After 24 hours</option><option value="168">After 7 days</option></select></label>
+            <label className="post-expiry">Expires if unopened<select value={hours} disabled={busy} onChange={event => setHours(event.target.value)}><option value="1">After 1 hour</option><option value="24">After 24 hours</option><option value="168">After 7 days</option><option value="never">Never expires</option></select></label>
             {passwordField("seal-password", "Password (optional)", "If you add a password, share it separately from the link.", "new-password")}
             <p className="post-private"><ShieldCheck size={17}/> Your words and design are encrypted before they leave your browser.</p>
             {error && <p className="post-error" role="alert">{error}</p>}
@@ -228,7 +228,7 @@ export default function Home() {
             <Envelope compact paper={letter.paper} stamp={letter.stamp}/>
             <label htmlFor="share-link">Your one-time letter link</label>
             <div className="post-copy"><input id="share-link" ref={shareInput} readOnly value={link} onFocus={event => event.target.select()}/><button type="button" className="post-button post-primary" onClick={copy}>{copied ? <Check size={18}/> : <Copy size={18}/>} {copied ? "Copied" : "Copy link"}</button></div>
-            <p className="post-note" role="status">{copied ? "Link copied. " : ""}Opens once · Expires in {expiry} if unread.</p>
+            <p className="post-note" role="status">{copied ? "Link copied. " : ""}Opens once · {hours === "never" ? "Never expires if unread." : `Expires in ${expiry} if unread.`}</p>
             {protectedCreated && <p className="post-private"><LockKeyhole size={16}/> Password protected. Send the password separately.</p>}
             {error && <p className="post-error" role="alert">{error}</p>}
             <div className="post-actions"><button className="post-back" onClick={() => reset("write")}><ArrowLeft size={17}/> Write another message</button><button className="post-button post-secondary" onClick={share}><Share2 size={17}/> Share link</button></div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-export const SITE_URL = "https://once-message.later-voice-token.workers.dev";
+export const SITE_URL = "https://once.samireddy.com";
 export const REPOSITORY_URL = "https://github.com/nani-samireddy/one-time-messager";
 export const LAST_UPDATED = "2026-11-11";
 export const LAST_UPDATED_LABEL = "11 November 2026";
