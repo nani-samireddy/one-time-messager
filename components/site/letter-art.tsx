@@ -8,10 +8,10 @@ export function Stamp({ stamp, size = 24 }: { stamp: Letter["stamp"]; size?: num
   return <Icon aria-hidden="true" size={size} strokeWidth={1.65} fill="currentColor" />;
 }
 
-export function Envelope({ open = false, compact = false, paper = "cream", stamp = "heart" }: {
-  open?: boolean; compact?: boolean; paper?: Letter["paper"]; stamp?: Letter["stamp"];
+export function Envelope({ open = false, compact = false, sealed = false, paper = "cream", stamp = "heart" }: {
+  open?: boolean; compact?: boolean; sealed?: boolean; paper?: Letter["paper"]; stamp?: Letter["stamp"];
 }) {
-  return <span aria-hidden="true" className={`post-envelope${open ? " is-open" : ""}${compact ? " is-compact" : ""}`} style={{ "--paper-color": papers[paper].color } as CSSProperties}>
+  return <span aria-hidden="true" className={`post-envelope${open ? " is-open" : ""}${compact ? " is-compact" : ""}${sealed ? " is-sealed" : ""}`} style={{ "--paper-color": papers[paper].color } as CSSProperties}>
     <svg viewBox="0 0 426 304" fill="none">
       <g className="post-sparks" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
         <path d="M31 111v22m-10-11h20M382 77v26m-12-13h24M396 206v18m-9-9h18" />
@@ -43,4 +43,12 @@ export function LetterPaper({ letter, preview = false }: { letter: Letter; previ
     <p>{letter.message}</p>
     {letter.from.trim() && <footer>— {letter.from.trim()}</footer>}
   </article>;
+}
+
+
+export function LetterReveal({ letter }: { letter: Letter }) {
+  return <div className="post-letter-reveal">
+    <div className="post-reveal-envelope"><Envelope compact open paper={letter.paper} stamp={letter.stamp}/></div>
+    <LetterPaper letter={letter}/>
+  </div>;
 }

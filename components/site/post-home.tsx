@@ -1,8 +1,8 @@
 import { ArrowRight, Heart, LockKeyhole, PenLine, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SITE_URL } from "../../lib/site";
 import { blankLetter, type Letter } from "../../lib/letter";
-import { Envelope, LetterPaper } from "./letter-art";
+import { Envelope, LetterReveal } from "./letter-art";
 
 export const ideas = [
   { name: "Thinking of you", mark: "✿", text: "You crossed my mind today, and I wanted to tell you why.\n\n" },
@@ -17,19 +17,46 @@ const demo: Letter = { ...blankLetter, to: "Someone lovely", from: "Once", messa
 
 export function PostHome({ start }: { start: (text?: string) => void }) {
   const [sampleOpen, setSampleOpen] = useState(false);
+  const [opening, setOpening] = useState<"write" | "sample" | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sampleButton = useRef<HTMLButtonElement>(null);
+  const closeSampleButton = useRef<HTMLButtonElement>(null);
+  const returnSampleFocus = useRef(false);
+
+  useEffect(() => () => { if (timer.current !== null) clearTimeout(timer.current); }, []);
+  useEffect(() => {
+    if (sampleOpen) closeSampleButton.current?.focus({ preventScroll: true });
+    else if (returnSampleFocus.current) {
+      sampleButton.current?.focus({ preventScroll: true });
+      returnSampleFocus.current = false;
+    }
+  }, [sampleOpen]);
+
+  function openEnvelope(target: "write" | "sample") {
+    if (timer.current !== null) return;
+    const finish = () => {
+      timer.current = null;
+      setOpening(null);
+      if (target === "write") start();
+      else setSampleOpen(true);
+    };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { finish(); return; }
+    setOpening(target);
+    timer.current = setTimeout(finish, 460);
+  }
   return <>
     <section className="post-hero" aria-labelledby="post-title">
       <span className="post-kicker"><Heart size={13}/> WORDS THAT DON’T STAY FOREVER</span>
       <h1 id="post-title">A note for <em>right now.</em></h1>
       <p>Write it. Pass it on. Let it go.</p>
-      <button type="button" className="post-envelope-button" aria-label="Start writing a letter" onClick={() => start()}><Envelope/></button>
-      <button type="button" className="post-button post-primary" onClick={() => start()}>Write a note <ArrowRight size={19}/></button>
+      <button type="button" className="post-envelope-button" aria-label="Start writing a letter" disabled={opening !== null} onClick={() => openEnvelope("write")}><Envelope open={opening === "write"}/></button>
+      <button type="button" className="post-button post-primary" disabled={opening !== null} onClick={() => openEnvelope("write")}>{opening === "write" ? "Opening…" : "Write a note"} <ArrowRight size={19}/></button>
       <span className="post-note">Free to send · Encrypted in your browser</span>
     </section>
     <section className="post-ideas" aria-labelledby="ideas-title">
       <h2 id="ideas-title">A little inspiration</h2>
       <p>Pick a prompt, then make the words your own.</p>
-      <div className="post-chips">{ideas.map(idea => <button type="button" key={idea.name} onClick={() => start(idea.text)}><span aria-hidden="true">{idea.mark}</span>{idea.name}</button>)}</div>
+      <div className="post-chips">{ideas.map(idea => <button type="button" key={idea.name} disabled={opening !== null} onClick={() => start(idea.text)}><span aria-hidden="true">{idea.mark}</span>{idea.name}</button>)}</div>
     </section>
     <section className="post-how" aria-labelledby="how-title">
       <span className="post-kicker">A LITTLE PRIVATE CORRESPONDENCE</span>
@@ -43,9 +70,9 @@ export function PostHome({ start }: { start: (text?: string) => void }) {
     <section className="post-demo" aria-labelledby="demo-title">
       <span className="post-kicker">A PEEK INSIDE</span>
       <h2 id="demo-title">Here’s what they’ll receive.</h2>
-      {sampleOpen ? <div className="post-demo-paper"><LetterPaper letter={demo}/><button className="post-button post-secondary" onClick={() => setSampleOpen(false)}>Close sample</button></div> : <>
-        <button type="button" className="post-envelope-button" aria-label="Open the sample envelope" onClick={() => setSampleOpen(true)}><Envelope compact/></button>
-        <button type="button" className="post-button post-secondary" onClick={() => setSampleOpen(true)}>Open sample letter</button>
+      {sampleOpen ? <div className="post-demo-paper"><LetterReveal letter={demo}/><button ref={closeSampleButton} className="post-button post-secondary" onClick={() => { returnSampleFocus.current = true; setSampleOpen(false); }}>Close sample</button></div> : <>
+        <button type="button" className="post-envelope-button" aria-label="Open the sample envelope" disabled={opening !== null} onClick={() => openEnvelope("sample")}><Envelope compact open={opening === "sample"}/></button>
+        <button type="button" ref={sampleButton} className="post-button post-secondary" disabled={opening !== null} onClick={() => openEnvelope("sample")}>{opening === "sample" ? "Opening…" : "Open sample letter"}</button>
       </>}
     </section>
     <section className="post-faq" aria-labelledby="faq-title">
@@ -54,7 +81,7 @@ export function PostHome({ start }: { start: (text?: string) => void }) {
       <details><summary>Is my letter private?</summary><p>Your browser encrypts the words and design together. Only someone with the full link and, if set, the password can open it.</p></details>
       <details><summary>What if they don’t open it?</summary><p>Choose one hour, one day, seven days, or Never expires. A link with no expiry stays available until it’s opened.</p></details>
       <details><summary>Do I need an account or a payment?</summary><p>Once is free. The <a href={SITE_URL}>public version</a> does not require an account.</p></details>
-      <button type="button" className="post-button post-primary" onClick={() => start()}>Write your own message <ArrowRight size={18}/></button>
+      <button type="button" className="post-button post-primary" disabled={opening !== null} onClick={() => start()}>Write your own message <ArrowRight size={18}/></button>
       <p className="post-postscript">P.S. Some things are better left off the record.</p>
     </section>
   </>;

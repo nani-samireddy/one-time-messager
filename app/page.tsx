@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ArrowRight, Check, Copy, Eye, EyeOff, LockKeyhole, Mail, Send, Share2, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Envelope, LetterPaper, Stamp } from "../components/site/letter-art";
+import { Envelope, LetterPaper, LetterReveal, Stamp } from "../components/site/letter-art";
 import { ideas, PostHome } from "../components/site/post-home";
 import { SiteFooter } from "../components/site/footer";
 import { blankLetter, decodeLetter, fonts, MAX_MESSAGE_LENGTH, MAX_NAME_LENGTH, papers, parseLetterLink, stamps, type Letter, type LetterLink } from "../lib/letter";
@@ -185,10 +185,10 @@ export default function Home() {
   </div>;
 
   return <div className="post-site">
-    <header className="post-header"><a href="/" className="post-brand" aria-label="Once home"><Mail size={21}/> once<span>.</span></a><a href="/about" className="post-about">How it works <ArrowRight size={14}/></a></header>
+    <header className="post-header"><a href="/" className="post-brand" aria-label="Once home"><Mail aria-hidden="true" size={21}/><span className="post-wordmark">once<span>.</span></span></a><a href="/about" className="post-about">How it works <ArrowRight size={14}/></a></header>
     <main className="post-main">
       {view === "home" && <PostHome start={start}/>}
-      {step >= 0 && <div className="post-workflow">
+      {step >= 0 && <div key={view} className="post-workflow post-stage-enter">
         <nav className="post-progress" aria-label="Letter progress"><span>STEP {step + 1} OF 4</span><ol>{steps.map((name, index) => <li key={name} data-complete={index < step} aria-current={index === step ? "step" : undefined}><span className="progress-dot" aria-hidden="true"/><span>{name}</span></li>)}</ol></nav>
         {view === "write" && <>
           <div className="post-heading"><span className="post-kicker">A LITTLE NOTE FROM YOU</span><h1 ref={title} tabIndex={-1}>Write your letter.</h1><p>What would you like them to know?</p></div>
@@ -225,7 +225,7 @@ export default function Home() {
         {view === "shared" && <>
           <div className="post-heading"><span className="post-kicker">SIGNED, SEALED, READY</span><h1 ref={title} tabIndex={-1}>Ready to pass it on.</h1><p>Share this link with your person. It works once, then disappears.</p></div>
           <section className="post-panel post-result">
-            <Envelope compact paper={letter.paper} stamp={letter.stamp}/>
+            <Envelope compact sealed paper={letter.paper} stamp={letter.stamp}/>
             <label htmlFor="share-link">Your one-time letter link</label>
             <div className="post-copy"><input id="share-link" ref={shareInput} readOnly value={link} onFocus={event => event.target.select()}/><button type="button" className="post-button post-primary" onClick={copy}>{copied ? <Check size={18}/> : <Copy size={18}/>} {copied ? "Copied" : "Copy link"}</button></div>
             <p className="post-note" role="status">{copied ? "Link copied. " : ""}Opens once · {hours === "never" ? "Never expires if unread." : `Expires in ${expiry} if unread.`}</p>
@@ -237,7 +237,7 @@ export default function Home() {
       </div>}
       {view === "inbox" && <div className="post-inbox">
         <div className="post-heading"><span className="post-kicker">SPECIAL DELIVERY</span><h1 ref={title} tabIndex={-1}>A moment just for you.</h1><p>This message can only be revealed once. Make sure you’re ready before opening.</p></div>
-        <Envelope open={busy}/>
+        <Envelope/>
         <form className="post-inbox-form" onSubmit={event => { event.preventDefault(); void reveal(); }}>
           {secret?.protected && passwordField("open-password", "Letter password", "A wrong password won’t use your one read.", "off")}
           {error && <p className="post-error" role="alert">{error}</p>}
@@ -246,7 +246,7 @@ export default function Home() {
       </div>}
       {view === "read" && incoming && <div className="post-inbox post-reading">
         <div className="post-heading"><span className="post-kicker">OPENED JUST FOR YOU</span><h1 ref={title} tabIndex={-1}>Your letter.</h1><p>The link has been used. Take your time reading it here.</p></div>
-        <LetterPaper letter={incoming}/>
+        <LetterReveal letter={incoming}/>
         <button className="post-button post-secondary" onClick={() => reset()}>Close message <Check size={18}/></button>
       </div>}
       {view === "gone" && <div className="post-inbox">
