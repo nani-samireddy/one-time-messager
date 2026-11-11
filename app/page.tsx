@@ -1,5 +1,6 @@
 "use client";
 
+import { Brand } from "../components/site/brand";
 import { ArrowLeft, ArrowRight, Check, Copy, Eye, EyeOff, LockKeyhole, Mail, Send, Share2, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Envelope, LetterPaper, LetterReveal, Stamp } from "../components/site/letter-art";
@@ -185,7 +186,7 @@ export default function Home() {
   </div>;
 
   return <div className="post-site">
-    <header className="post-header"><a href="/" className="post-brand" aria-label="Once home"><Mail aria-hidden="true" size={21}/><span className="post-wordmark">once<span>.</span></span></a><a href="/about" className="post-about">How it works <ArrowRight size={14}/></a></header>
+    <header className="post-header"><Brand/><a href="/about" className="post-about">How it works <ArrowRight size={14}/></a></header>
     <main className="post-main">
       {view === "home" && <PostHome start={start}/>}
       {step >= 0 && <div key={view} className="post-workflow post-stage-enter">

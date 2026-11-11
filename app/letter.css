@@ -18,9 +18,21 @@
 .post-site a { color: inherit; }
 .post-header { position: relative; isolation: isolate; max-width: 1240px; margin: 0 auto; padding: 22px clamp(18px, 4vw, 54px); min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .post-header::before { content: ""; position: absolute; z-index: -1; inset: 0; left: 50%; width: 100vw; transform: translateX(-50%); background: var(--post-ground); border-bottom: 1px solid var(--post-line); }
-.post-brand { display: inline-flex; align-items: center; gap: 6px; color: var(--post-ink); font: 800 31px/1 var(--post-display); letter-spacing: -2px; text-decoration: none; }
-.post-brand svg { flex: none; }
+.post-brand { display: inline-flex; align-items: center; gap: 8px; color: var(--post-ink); text-decoration: none; }
+.post-brand-stamp { display: block; flex: none; width: 38px; height: 38px; transform: rotate(-7deg); animation: post-stamp-arrival .58s ease-out both; }
+.post-brand:is(:hover, :focus-visible) .post-brand-stamp { animation-name: post-stamp-wiggle; }
+.post-wordmark { font: 700 42px/.82 var(--post-hand); letter-spacing: -.045em; padding-bottom: 3px; }
 .post-wordmark > span { color: var(--post-accent); }
+@keyframes post-stamp-arrival {
+  0% { transform: translateY(2px) rotate(-13deg) scale(.94); }
+  58% { transform: translateY(-3px) rotate(5deg); }
+  100% { transform: rotate(-7deg); }
+}
+@keyframes post-stamp-wiggle {
+  0%, 100% { transform: rotate(-7deg); }
+  38% { transform: translateY(-4px) rotate(9deg); }
+  69% { transform: translateY(-1px) rotate(-11deg); }
+}
 .post-about { display: inline-flex; align-items: center; gap: 7px; font: 750 13px/1.4 var(--post-display); text-decoration: none; }
 .post-about:hover, .post-back:hover { text-decoration: underline; text-underline-offset: 4px; }
 .post-main { max-width: none; margin: 0; }
@@ -168,7 +180,8 @@
 
 @media (max-width: 650px) {
   .post-header { min-height: 65px; padding-block: 14px; }
-  .post-brand { font-size: 26px; }
+  .post-brand-stamp { width: 32px; height: 32px; }
+  .post-wordmark { font-size: 36px; }
   .post-hero { padding-top: 37px; padding-bottom: 49px; }
   .post-hero h1 { font-size: clamp(38px, 10vw, 59px); }
   .post-hero > p { max-width: 280px; }
