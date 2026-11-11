@@ -194,7 +194,7 @@ export default function Home() {
           <div className="post-heading"><span className="post-kicker">A LITTLE NOTE FROM YOU</span><h1 ref={title} tabIndex={-1}>Write your letter.</h1><p>What would you like them to know?</p></div>
           <form onSubmit={event => { event.preventDefault(); if (letter.message.trim()) go("style"); }}>
             <div className="post-toolbar"><details><summary>✦ Writing prompts</summary><div className="post-template-menu">{ideas.map(idea => <button key={idea.name} type="button" onClick={event => { event.currentTarget.closest("details")?.removeAttribute("open"); insertTemplate(idea.text); }}><span aria-hidden="true">{idea.mark}</span> {idea.name}</button>)}</div></details></div>
-            <div className="post-editor letter-font-handwritten"><label className="sr-only" htmlFor="letter-body">Your letter</label><textarea id="letter-body" ref={editor} value={letter.message} onChange={event => update("message", event.target.value)} maxLength={MAX_MESSAGE_LENGTH} placeholder={"Dear someone,\n\nI’ve been meaning to tell you…"} required/><span className="post-count">{letter.message.length.toLocaleString()} / 4,000</span></div>
+            <div className="post-editor letter-font-handwritten"><label className="sr-only" htmlFor="letter-body">Your letter</label><textarea id="letter-body" ref={editor} value={letter.message} onChange={event => update("message", event.target.value)} maxLength={MAX_MESSAGE_LENGTH} placeholder="Write something just for them…" required/><span className="post-count">{letter.message.length.toLocaleString()} / 4,000</span></div>
             <div className="post-actions"><button type="button" className="post-back" onClick={() => go("home")}><ArrowLeft size={17}/> Home</button><button className="post-button post-primary" disabled={!letter.message.trim()}>Customize letter <ArrowRight size={18}/></button></div>
           </form>
         </>}
@@ -219,11 +219,11 @@ export default function Home() {
             {passwordField("seal-password", "Password (optional)", "If you add a password, share it separately from the link.", "new-password")}
             <p className="post-private"><ShieldCheck size={17}/> Your words and design are encrypted before they leave your browser.</p>
             {error && <p className="post-error" role="alert">{error}</p>}
-            <div className="post-actions"><button type="button" disabled={busy} className="post-back" onClick={() => go("style")}><ArrowLeft size={17}/> Customize</button><button className="post-button post-primary" disabled={busy}>{busy ? "Sealing…" : "Seal & create link"} <Send size={18}/></button></div>
+            <div className="post-actions"><button type="button" disabled={busy} className="post-back" onClick={() => go("style")}><ArrowLeft size={17}/> Customize</button><button className="post-button post-primary" disabled={busy}>{busy ? "Sealing…" : "Seal & create a link"} <Send size={18}/></button></div>
           </form>
         </>}
         {view === "shared" && <>
-          <div className="post-heading"><span className="post-kicker">SIGNED, SEALED, READY</span><h1 ref={title} tabIndex={-1}>Pass it on.</h1><p>Send this private link to the person it’s meant for.</p></div>
+          <div className="post-heading"><span className="post-kicker">SIGNED, SEALED, READY</span><h1 ref={title} tabIndex={-1}>Ready to pass it on.</h1><p>Share this link with your person. It works once, then disappears.</p></div>
           <section className="post-panel post-result">
             <Envelope compact paper={letter.paper} stamp={letter.stamp}/>
             <label htmlFor="share-link">Your one-time letter link</label>
@@ -231,28 +231,28 @@ export default function Home() {
             <p className="post-note" role="status">{copied ? "Link copied. " : ""}Opens once · Expires in {expiry} if unread.</p>
             {protectedCreated && <p className="post-private"><LockKeyhole size={16}/> Password protected. Send the password separately.</p>}
             {error && <p className="post-error" role="alert">{error}</p>}
-            <div className="post-actions"><button className="post-back" onClick={() => reset("write")}><ArrowLeft size={17}/> Write another</button><button className="post-button post-secondary" onClick={share}><Share2 size={17}/> Share link</button></div>
+            <div className="post-actions"><button className="post-back" onClick={() => reset("write")}><ArrowLeft size={17}/> Write another message</button><button className="post-button post-secondary" onClick={share}><Share2 size={17}/> Share link</button></div>
           </section>
         </>}
       </div>}
       {view === "inbox" && <div className="post-inbox">
-        <div className="post-heading"><span className="post-kicker">SPECIAL DELIVERY</span><h1 ref={title} tabIndex={-1}>A letter for you.</h1><p>Open it when you’re ready. You get one read.</p></div>
+        <div className="post-heading"><span className="post-kicker">SPECIAL DELIVERY</span><h1 ref={title} tabIndex={-1}>A moment just for you.</h1><p>This message can only be revealed once. Make sure you’re ready before opening.</p></div>
         <Envelope open={busy}/>
         <form className="post-inbox-form" onSubmit={event => { event.preventDefault(); void reveal(); }}>
           {secret?.protected && passwordField("open-password", "Letter password", "A wrong password won’t use your one read.", "off")}
           {error && <p className="post-error" role="alert">{error}</p>}
-          <button className="post-button post-primary" disabled={busy || (secret?.protected && !password)}>{busy ? "Opening…" : "Open my letter"} <Mail size={18}/></button>
+          <button className="post-button post-primary" disabled={busy || (secret?.protected && !password)}>{busy ? "Opening…" : "Reveal my message"} <Mail size={18}/></button>
         </form>
       </div>}
       {view === "read" && incoming && <div className="post-inbox post-reading">
         <div className="post-heading"><span className="post-kicker">OPENED JUST FOR YOU</span><h1 ref={title} tabIndex={-1}>Your letter.</h1><p>The link has been used. Take your time reading it here.</p></div>
         <LetterPaper letter={incoming}/>
-        <button className="post-button post-secondary" onClick={() => reset()}>Close letter <Check size={18}/></button>
+        <button className="post-button post-secondary" onClick={() => reset()}>Close message <Check size={18}/></button>
       </div>}
       {view === "gone" && <div className="post-inbox">
-        <div className="post-heading"><span className="post-kicker">RETURN TO SENDER</span><h1 ref={title} tabIndex={-1}>This letter is gone.</h1><p>{error || "It may have already been read, expired, or arrived with an incomplete link."}</p></div>
+        <div className="post-heading"><span className="post-kicker">RETURN TO SENDER</span><h1 ref={title} tabIndex={-1}>Here once. Now gone.</h1><p>{error || "It may have already been read, expired, or arrived with an incomplete link."}</p></div>
         <Envelope open compact stamp="none"/>
-        <button className="post-button post-primary" onClick={() => reset("write")}>Write a letter <ArrowRight size={18}/></button>
+        <button className="post-button post-primary" onClick={() => reset("write")}>Write your own message <ArrowRight size={18}/></button>
       </div>}
     </main>
     <div className="post-footer"><SiteFooter/></div>

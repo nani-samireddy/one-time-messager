@@ -1,7 +1,7 @@
 export const MAX_MESSAGE_LENGTH = 4000;
 export const MAX_NAME_LENGTH = 60;
 export const papers = {
-  cream: { label: "Vanilla", color: "#fff9e5" },
+  cream: { label: "Vanilla", color: "#f9f8ec" },
   rose: { label: "Rose", color: "#ffe7ee" },
   lilac: { label: "Lilac", color: "#f0e9ff" },
   mint: { label: "Mint", color: "#e6f5e8" },

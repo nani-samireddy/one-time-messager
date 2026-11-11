@@ -18,11 +18,11 @@ export function PostHome({ start }: { start: (text?: string) => void }) {
   const [sampleOpen, setSampleOpen] = useState(false);
   return <>
     <section className="post-hero" aria-labelledby="post-title">
-      <span className="post-kicker"><Heart size={13}/> THE ONE-TIME POST</span>
-      <h1 id="post-title">Some words are<br/>just for <em>you two.</em></h1>
-      <p>A little letter for someone special. One link, one read.</p>
+      <span className="post-kicker"><Heart size={13}/> WORDS THAT DON’T STAY FOREVER</span>
+      <h1 id="post-title">A note for <em>right now.</em></h1>
+      <p>Write it. Pass it on. Let it go.</p>
       <button type="button" className="post-envelope-button" aria-label="Start writing a letter" onClick={() => start()}><Envelope/></button>
-      <button type="button" className="post-button post-primary" onClick={() => start()}>Start your letter <ArrowRight size={19}/></button>
+      <button type="button" className="post-button post-primary" onClick={() => start()}>Write a note <ArrowRight size={19}/></button>
       <span className="post-note">Free to send · Encrypted in your browser</span>
     </section>
     <section className="post-ideas" aria-labelledby="ideas-title">
@@ -31,12 +31,12 @@ export function PostHome({ start }: { start: (text?: string) => void }) {
       <div className="post-chips">{ideas.map(idea => <button type="button" key={idea.name} onClick={() => start(idea.text)}><span aria-hidden="true">{idea.mark}</span>{idea.name}</button>)}</div>
     </section>
     <section className="post-how" aria-labelledby="how-title">
-      <span className="post-kicker">FROM YOU TO THEM</span>
-      <h2 id="how-title">Write it. Dress it. Send it.</h2>
+      <span className="post-kicker">A LITTLE PRIVATE CORRESPONDENCE</span>
+      <h2 id="how-title">How it works</h2>
       <ol>
-        <li><PenLine size={24}/><h3>Write your letter</h3><p>Start with a blank page or a little prompt.</p></li>
-        <li><Sparkles size={24}/><h3>Make it yours</h3><p>Pick your paper, handwriting, and seal.</p></li>
-        <li><LockKeyhole size={24}/><h3>Share it privately</h3><p>Send a link that opens only once.</p></li>
+        <li><PenLine size={24}/><h3>Write it privately</h3><p>Your words are encrypted before they leave your device.</p></li>
+        <li><Sparkles size={24}/><h3>Send the link</h3><p>A small link for something you don’t want to leave around.</p></li>
+        <li><LockKeyhole size={24}/><h3>One read. Then gone.</h3><p>Once opened, the link won’t work twice.</p></li>
       </ol>
     </section>
     <section className="post-demo" aria-labelledby="demo-title">
@@ -53,7 +53,8 @@ export function PostHome({ start }: { start: (text?: string) => void }) {
       <details><summary>Is my letter private?</summary><p>Your browser encrypts the words and design together. Only someone with the full link and, if set, the password can open it.</p></details>
       <details><summary>What if they don’t open it?</summary><p>Choose an expiry of one hour, one day, or seven days. After that, the link no longer opens.</p></details>
       <details><summary>Do I need an account or a payment?</summary><p>Once is free. The <a href="https://once-message.later-voice-token.workers.dev/">public version</a> does not require an account.</p></details>
-      <button type="button" className="post-button post-primary" onClick={() => start()}>Write someone a letter <ArrowRight size={18}/></button>
+      <button type="button" className="post-button post-primary" onClick={() => start()}>Write your own message <ArrowRight size={18}/></button>
+      <p className="post-postscript">P.S. Some things are better left off the record.</p>
     </section>
   </>;
 }

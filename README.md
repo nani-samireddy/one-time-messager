@@ -57,7 +57,7 @@ The integration check covers encryption with Unicode, successful first reveal, r
 - AES-256-GCM encryption happens in the browser. The server receives ciphertext and an IV, never the key or plaintext.
 - Styled letters use `/#<random-id>.<key-material>[.p].l`. Text, optional names, and styling are encrypted together. Older plain-text links without the `.l` flag remain supported. Both the ID and key material live in the fragment. The ID is sent explicitly to the reveal API; the key never is.
 - The URL does not contain the entire message: that would let anyone decode it repeatedly. A server-side record is necessary to enforce one-time retrieval across devices.
-- The Open my letter button prevents ordinary link preview crawlers from consuming messages. A single `DELETE ... RETURNING` query retrieves and deletes the message, preventing simultaneous reads.
+- The Reveal my message button prevents ordinary link preview crawlers from consuming messages. A single `DELETE ... RETURNING` query retrieves and deletes the message, preventing simultaneous reads.
 - Unopened messages become inaccessible after 1 hour, 24 hours, or 7 days. Expired rows are cleaned up on subsequent creates. With no subsequent traffic they may remain encrypted in the database until cleanup; they cannot be revealed through the API.
 - The reader can view the message until closing or navigating away. Refreshing does not retrieve it again. Network failure after deletion can lose a message before the recipient sees it.
 - Anyone with the complete link and, for protected messages, the password can reveal it first. Recipients can still copy or screenshot the message. Deletion from the live application database does not promise erasure from provider backups.
