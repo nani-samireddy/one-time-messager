@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { SITE_URL, SITE_DESCRIPTION, pageMetadata } from "../lib/site";
 import "./globals.css";
+import "./letter.css";
 export const metadata: Metadata = {
-  ...pageMetadata("Encrypted one-time messages", SITE_DESCRIPTION, "/"),
+  ...pageMetadata("Encrypted one-time letters", SITE_DESCRIPTION, "/"),
   metadataBase: new URL(SITE_URL),
-  title: { default: "Once — encrypted one-time messages", template: "%s · Once" },
+  title: { default: "Once — encrypted one-time letters", template: "%s · Once" },
   applicationName: "Once",
   referrer: "no-referrer",
   robots: { index: true, follow: true },
