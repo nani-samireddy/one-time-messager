@@ -39,7 +39,7 @@ Use the Workers Free plan and the included D1 free tier. No paid database, paid 
 
 3. Open the `workers.dev` URL printed by Wrangler. Links automatically use the site's current origin.
 
-The production Worker serves [once.samireddy.com](https://once.samireddy.com/) and keeps its original `workers.dev` address for existing links. To keep the custom domain on redeployment, pass it as a second argument to `npm run host:prepare -- YOUR_DATABASE_ID once.samireddy.com`.
+To attach a custom domain, its zone must be in the same Cloudflare account as the Worker. Pass the hostname and zone to `npm run host:prepare -- YOUR_DATABASE_ID YOUR_HOSTNAME YOUR_ZONE` when deploying. This keeps the original `workers.dev` address available for existing links. Update the canonical origin in `lib/site.ts` when the new domain is ready.
 
 After updates, rebuild, rerun `host:prepare` with the same database ID, apply new migrations, and redeploy. The generated Cloudflare configuration is checkout-local and ignored by Git. Keep the same database for existing unopened links to continue working. Direct Cloudflare deployment is independent of the optional Sites hosting manifest.
 
