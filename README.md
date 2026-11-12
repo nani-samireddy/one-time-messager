@@ -17,6 +17,10 @@ npm run dev
 
 Open the printed localhost URL. Local preview and production use separate databases.
 
+## Production
+
+The public site is [once.samireddy.com](https://once.samireddy.com/). Deploy it with `npm run host:prepare -- YOUR_DATABASE_UUID once.samireddy.com samireddy.com` in the Cloudflare account that owns the zone. The legacy Worker keeps its own database so links created before the move can still be opened at their original address.
+
 ## Host free on your own Cloudflare account
 
 Use the Workers Free plan and the included D1 free tier. No paid database, paid domain, or Sites subscription is needed for this path. You receive a `workers.dev` URL. Usage is subject to Cloudflare's free tier limits; remain on the Free plan to avoid paid usage. Current allowances: https://developers.cloudflare.com/workers/platform/pricing/ and https://developers.cloudflare.com/d1/platform/pricing/.
